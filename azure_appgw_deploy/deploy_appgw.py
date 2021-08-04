@@ -15,7 +15,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Pull in the AWS Provider variables. These are set in the Skillet Environment and are hidden variables so the
 # user doesn't need to adjust them everytime.
 variables = dict(PANOS_PASSWORD=os.environ.get('PASSWORD'), TF_VAR_password=os.environ.get('PASSWORD'),
-                 PANOS_USERNAME='refarchadmin', TF_IN_AUTOMATION='True')
+                 PANOS_USERNAME='refarchadmin', TF_IN_AUTOMATION='True',
+                 HOME='/home/terraform')
 variables.update(TF_VAR_deployment_name=os.environ.get('DEPLOYMENT_NAME'), TF_VAR_azure_region=os.environ.get('AZURE_REGION'), TF_VAR_authcode=os.environ.get('authcode'))
                 # TF_VAR_vpn_peer=os.environ.get('vpn_peer'), TF_VAR_vpn_as=os.environ.get('vpn_as'), TF_VAR_vpn_psk=os.environ.get('vpn_psk'))
 # A variable the defines if we are creating or destroying the environment via terraform. Set in the dropdown
@@ -68,7 +69,8 @@ if tfcommand == 'apply':
     # Run terraform apply
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform apply -auto-approve -no-color -input=false',
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     #  The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -93,7 +95,8 @@ elif tfcommand == 'destroy':
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform destroy -auto-approve -no-color -input=false',
     #container = client.containers.run('paloaltonetworks/terraform-azure', "terraform state rm aazurerm_storage_share.this",
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.

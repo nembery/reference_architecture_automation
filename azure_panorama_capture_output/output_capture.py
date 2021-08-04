@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 from docker import DockerClient
 
-# Pull in the AWS Provider variables. These are set in Panhandler's skillet environment and are hidden variables so the user
-# doesn't need to adjust them everytime
-variables = dict(TF_IN_AUTOMATION='True')
+# Pull in the AWS Provider variables. These are set in Panhandler's skillet environment and are hidden variables so the
+# user doesn't need to adjust them everytime
+variables = dict(TF_IN_AUTOMATION='True', HOME='/home/terraform')
 
 client = DockerClient()
 
