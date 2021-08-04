@@ -14,7 +14,7 @@ variables = dict(GOOGLE_APPLICATION_CREDENTIALS=wdir+'gcloud', TF_IN_AUTOMATION=
 client = DockerClient()
 # Capture the External IP address of Panorama from the Terraform output
 eip = json.loads(client.containers.run('paloaltonetworks/terraform-gcloud', 'terraform output -json -no-color', auto_remove=True,
-                                       volumes_from=socket.gethostname(), working_dir=wdir, environment=variables).decode('utf-8'))
+                                       volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(), environment=variables).decode('utf-8'))
 panorama_ip = (eip['primary_eip']['value'])
 panorama_private_ip = (eip['primary_private_ip']['value'])
 secondary_ip = (eip['secondary_eip']['value'])

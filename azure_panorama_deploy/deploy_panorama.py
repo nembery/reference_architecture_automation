@@ -55,7 +55,7 @@ client = DockerClient()
 if tfcommand == 'apply':
     container = client.containers.run('paloaltonetworks/terraform-azure', 'az account list', auto_remove=True,
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      volumes_from=socket.gethostname(), working_dir=wdir,
+                                      volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -66,7 +66,7 @@ if tfcommand == 'apply':
     # This allows it to access the files Panhandler downloaded from the GIT repo.
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform init -no-color -input=false', auto_remove=True,
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      volumes_from=socket.gethostname(), working_dir=wdir,
+                                      volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -75,7 +75,7 @@ if tfcommand == 'apply':
     # Run terraform apply
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform apply -auto-approve -no-color -input=false',
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     #  The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -85,7 +85,7 @@ if tfcommand == 'apply':
     # Capture the IP addresses of Panorama using Terraform output
     eip = json.loads(client.containers.run('paloaltonetworks/terraform-azure', 'terraform output -json -no-color', auto_remove=True,
                                            volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                           volumes_from=socket.gethostname(), working_dir=wdir,
+                                           volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                            environment=variables).decode('utf-8'))
     try:
         panorama_ip = (eip['primary_eip']['value'])
@@ -158,7 +158,7 @@ if tfcommand == 'apply':
 elif tfcommand == 'destroy':
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform destroy -auto-approve -no-color -input=false',
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.

@@ -102,7 +102,7 @@ if tfcommand == 'apply':
     # Init terraform with the modules and providers. The continer will have the some volumes as Panhandler.
     # This allows it to access the files Panhandler downloaded from the GIT repo.
     container = client.containers.run('paloaltonetworks/terraform-gcloud', 'terraform init -no-color -input=false', auto_remove=True,
-                                      volumes_from=socket.gethostname(), working_dir=wdir,
+                                      volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -110,7 +110,7 @@ if tfcommand == 'apply':
         print(line.decode('utf-8').strip())
     # Run terraform apply
     container = client.containers.run('paloaltonetworks/terraform-gcloud', 'terraform apply -auto-approve -no-color -input=false',
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     #  The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -119,7 +119,7 @@ if tfcommand == 'apply':
 
     # Capture the IP addresses of Panorama using Terraform output
     eip = json.loads(client.containers.run('paloaltonetworks/terraform-gcloud', 'terraform output -json -no-color', auto_remove=True,
-                                           volumes_from=socket.gethostname(), working_dir=wdir,
+                                           volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                            environment=variables).decode('utf-8'))
     try:
         panorama_ip = (eip['primary_eip']['value'])
@@ -193,7 +193,7 @@ elif tfcommand == 'destroy':
     variables.update(GOOGLE_APPLICATION_CREDENTIALS=wdir+'gcloud')
     variables.update(TF_VAR_ra_key="")
     container = client.containers.run('paloaltonetworks/terraform-gcloud', 'terraform destroy -auto-approve -no-color -input=false',
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.

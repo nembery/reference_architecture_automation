@@ -27,17 +27,17 @@ else:
         fh.write(primary_inventory)
 
 client = DockerClient()
-container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook platformsettings.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook platformsettings.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
 # Monitor the log so that the user can see the console output during the run versus waiting until it is complete. The container stops and is removed once the run is complete and this loop will exit at that time.
 for line in container.logs(stream=True):
     print(line.decode('utf-8').strip())
 
 # Run the appropriate Ansible playbook based on if the user selected HA or not
 if os.environ.get('enable_ha') == "true":
-    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook ha.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook ha.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
 else:
-    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook otp.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook otp.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())

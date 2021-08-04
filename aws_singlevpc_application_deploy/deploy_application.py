@@ -48,7 +48,7 @@ if tfcommand == 'apply':
     # Init terraform with the modules and providers. The continer will have the some volumes as Panhandler.
     # This allows it to access the files Panhandler downloaded from the GIT repo.
     container = client.containers.run('hashicorp/terraform:0.12.29', 'init -no-color -input=false', auto_remove=True,
-                                      volumes_from=socket.gethostname(), working_dir=wdir,
+                                      volumes_from=socket.gethostname(), working_dir=wdir,user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -57,12 +57,12 @@ if tfcommand == 'apply':
 
     # Run terraform apply
     container = client.containers.run('hashicorp/terraform:0.12.29', 'apply -auto-approve -no-color -input=false',
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
     # Commit and push the changes in Panorama
-    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
 
@@ -70,12 +70,12 @@ if tfcommand == 'apply':
 # If the variable is destroy, then destroy the environment and commit and push the changes in Panorama.
 elif tfcommand == 'destroy':
     container = client.containers.run('hashicorp/terraform:0.12.29', 'destroy -auto-approve -no-color -input=false',
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
 
-    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
 

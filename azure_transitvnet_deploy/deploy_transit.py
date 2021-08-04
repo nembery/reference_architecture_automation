@@ -56,7 +56,7 @@ with open("inventory.yml", "w") as fh:
 if tfcommand == 'apply':
 
     if os.path.exists('key') is not True:
-        container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook panoramasettings.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+        container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook panoramasettings.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
         for line in container.logs(stream=True):
@@ -70,7 +70,7 @@ if tfcommand == 'apply':
     # This allows it to access the files Panhandler downloaded from the GIT repo.
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform init -no-color -input=false', auto_remove=True,
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      volumes_from=socket.gethostname(), working_dir=wdir,
+                                      volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -79,14 +79,14 @@ if tfcommand == 'apply':
     # Run terraform apply
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform apply -auto-approve -no-color -input=false',
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     #  The container stops and is removed once the run is complete and this loop will exit at that time.
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
 
-    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
     for line in container.logs(stream=True):
@@ -104,7 +104,7 @@ elif tfcommand == 'destroy':
     container = client.containers.run('paloaltonetworks/terraform-azure', 'terraform destroy -auto-approve -no-color -input=false',
     #container = client.containers.run('paloaltonetworks/terraform-azure', "terraform state rm aazurerm_storage_share.this",
                                       volumes={'terraform-azure': {'bind': '/home/terraform/.azure/', 'mode': 'rw'}},
-                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir,
+                                      auto_remove=True, volumes_from=socket.gethostname(), working_dir=wdir, user=os.getuid(),
                                       environment=variables, detach=True)
     # Monitor the log so that the user can see the console output during the run versus waiting until it is complete.
     # The container stops and is removed once the run is complete and this loop will exit at that time.
@@ -112,7 +112,7 @@ elif tfcommand == 'destroy':
         print(line.decode('utf-8').strip())
     # Remove the SSH keys we used to provision Panorama from the container.
 
-    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), detach=True)
+    container = client.containers.run('paloaltonetworks/pan-ansible', "ansible-playbook commit.yml -e "+ansible_variables+" -i inventory.yml", auto_remove=True, volumes_from=socket.gethostname(), working_dir=os.getcwd(), user=os.getuid(), detach=True)
     for line in container.logs(stream=True):
         print(line.decode('utf-8').strip())
 

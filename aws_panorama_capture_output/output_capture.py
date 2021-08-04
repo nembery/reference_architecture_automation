@@ -17,7 +17,7 @@ wdir = str(path.parents[0])+"/terraform/aws/panorama/"
 
 # Capture the External IP address of Panorama from the Terraform output
 eip = json.loads(client.containers.run('hashicorp/terraform:0.12.29', 'output -json -no-color', auto_remove=True,
-                                       volumes_from=socket.gethostname(), working_dir=wdir, environment=variables).decode('utf-8'))
+                                       volumes_from=socket.gethostname(), working_dir=wdir, environment=variables, user=os.getuid()).decode('utf-8'))
 panorama_ip = (eip['primary_eip']['value'])
 panorama_private_ip = (eip['primary_private_ip']['value'])
 secondary_ip = (eip['secondary_eip']['value'])
