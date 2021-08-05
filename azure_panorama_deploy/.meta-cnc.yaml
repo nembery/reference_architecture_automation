@@ -1,6 +1,6 @@
 name: Panorama on Azure
 
-label: 1 - Deploy Panorama
+label: 2 - Deploy Panorama
 
 description: |
   Deploy Panorama with optional HA
@@ -15,13 +15,8 @@ labels:
 variables:
   - name: DEPLOYMENT_NAME
     description: Prefix for deployment
-    default: "unique_123"
-    type_hint: text
-    help_text: This value must be unique within the Azure Subscription
-    allow_special_characters: False
-    attributes:
-      min: 1
-      max: 8
+    default: ""
+    type_hint: hidden
   - name: PASSWORD
     description: Admin Password
     type_hint: hidden
