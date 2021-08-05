@@ -18,6 +18,10 @@ variables:
     default: "unique_123"
     type_hint: text
     help_text: This value must be unique within the Azure Subscription
+    allow_special_characters: False
+    attributes:
+      min: 1
+      max: 8
   - name: PASSWORD
     description: Admin Password
     type_hint: hidden
