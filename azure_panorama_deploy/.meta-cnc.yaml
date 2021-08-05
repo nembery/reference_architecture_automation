@@ -15,8 +15,9 @@ labels:
 variables:
   - name: DEPLOYMENT_NAME
     description: Prefix for deployment
-    default: ""
+    default: "Change_Me_to_something_unique"
     type_hint: hidden
+    help_text: This value must be unique within the Azure Subscription
   - name: PASSWORD
     description: Admin Password
     type_hint: hidden
