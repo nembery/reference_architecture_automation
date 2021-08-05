@@ -1,6 +1,6 @@
 name: Panorama on Azure
 
-label: 2 - Deploy Panorama
+label: 1 - Deploy Panorama
 
 description: |
   Deploy Panorama with optional HA
